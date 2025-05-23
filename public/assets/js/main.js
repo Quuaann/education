@@ -24,4 +24,31 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!valid) e.preventDefault();
         });
     });
+
+
+    const form = document.querySelector('.auth-container form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            let valid = true;
+            
+            // Validate password match
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirm_password');
+            
+            if (password.value !== confirmPassword.value) {
+                alert('Mật khẩu không khớp!');
+                valid = false;
+            }
+            
+            if (password.value.length < 8) {
+                alert('Mật khẩu phải có ít nhất 8 ký tự!');
+                valid = false;
+            }
+            
+            if (!valid) {
+                e.preventDefault();
+            }
+        });
+    }
 });
+

@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['role'] = $user['role'];
-        redirect('/admin/dashboard.php');
+        redirect('/index.php');
     } else {
         $_SESSION['error'] = "Email hoặc mật khẩu không đúng";
         redirect('/modules/auth/views/login_view.php');

@@ -1,68 +1,64 @@
 <?php
-require_once '../../../includes/config.php';
-require_once '../../../includes/auth_functions.php';
+// modules/auth/controllers/RegisterController.php
+require_once __DIR__ . '/../../../includes/config.php';
+require_once __DIR__ . '/../../../includes/auth_functions.php';
 
-class RegisterController {
-    private $conn;
+session_start();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = sanitize_input($_POST['username']);
+    $email = sanitize_input($_POST['email']);
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
+
+    // Validate input
+    $errors = [];
     
-    public function __construct($conn) {
-        $this->conn = $conn;
+    if (empty($username)) {
+        $errors['username'] = 'Vui lòng nhập tên đăng nhập';
+    } elseif (strlen($username) < 5) {
+        $errors['username'] = 'Tên đăng nhập phải có ít nhất 5 ký tự';
     }
 
-    public function handleRegister() {
-        $error = '';
-        
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = sanitize_input($_POST['username']);
-            $email = sanitize_input($_POST['email']);
-            $password = $_POST['password'];
-            $confirm_password = $_POST['confirm_password'];
-
-            // Validation
-            if (empty($username) || empty($email) || empty($password)) {
-                $error = 'Vui lòng điền đầy đủ thông tin';
-            } elseif ($password !== $confirm_password) {
-                $error = 'Mật khẩu không khớp';
-            } else {
-                $error = $this->registerUser($username, $email, $password);
-                
-                if ($error === '') {
-                    header('Location: register_success.php');
-                    exit();
-                }
-            }
-        }
-        
-        return $error;
+    if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors['email'] = 'Email không hợp lệ';
     }
 
-    private function registerUser($username, $email, $password) {
-        // Check existing user
-        $stmt = $this->conn->prepare("SELECT email FROM accounts WHERE email = ?");
+    if (strlen($password) < 8) {
+        $errors['password'] = 'Mật khẩu phải có ít nhất 8 ký tự';
+    } elseif ($password !== $confirm_password) {
+        $errors['confirm_password'] = 'Mật khẩu không khớp';
+    }
+
+    // Check if email exists
+    if (empty($errors)) {
+        $stmt = $conn->prepare("SELECT id FROM accounts WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         
         if ($stmt->get_result()->num_rows > 0) {
-            return 'Email đã được đăng ký';
+            $errors['email'] = 'Email đã được đăng ký';
         }
+    }
 
-        // Insert new user
+    // Insert new user
+    if (empty($errors)) {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $this->conn->prepare("INSERT INTO accounts (username, email, password) VALUES (?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO accounts (username, email, password, role) VALUES (?, ?, ?, 'student')");
         $stmt->bind_param("sss", $username, $email, $hashed_password);
 
-        if (!$stmt->execute()) {
-            return 'Đăng ký thất bại: ' . $this->conn->error;
+        if ($stmt->execute()) {
+            $_SESSION['register_success'] = true;
+            header('Location: /modules/auth/views/register_success.php');
+            exit();
+        } else {
+            $errors['database'] = 'Lỗi hệ thống: ' . $conn->error;
         }
-
-        return '';
     }
+
+    $_SESSION['register_errors'] = $errors;
+    $_SESSION['old_input'] = $_POST;
+    header('Location: /modules/auth/views/register_view.php');
+    exit();
 }
-
-// Khởi tạo và xử lý
-$registerController = new RegisterController($conn);
-$error = $registerController->handleRegister();
-
-// Hiển thị view
-require '../views/register_view.php';
 ?>
