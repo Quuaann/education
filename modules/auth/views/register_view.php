@@ -1,7 +1,6 @@
 <?php
 // modules/auth/views/register_view.php
 require_once __DIR__ . '/../../../templates/header.php';
-session_start();
 
 $errors = $_SESSION['register_errors'] ?? [];
 $old_input = $_SESSION['old_input'] ?? [];

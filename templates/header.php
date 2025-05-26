@@ -12,7 +12,15 @@
             <img src="/public/assets/images/logo.png" alt="Logo" class="logo">
             <nav>
                 <a href="/modules/auth/views/register_view.php">Đăng ký</a>
-                <a href="/modules/auth/views/login_view.php">Đăng nhập</a>
+                <?php 
+                if (session_status() === PHP_SESSION_NONE) {
+                    session_start();
+                }
+                if (isset($_SESSION['user_name']) && !empty($_SESSION['user_name'])): ?>
+                    <a href="/modules/auth/controllers/LogoutController.php">Đăng xuất</a>
+                <?php else: ?>
+                    <a href="/modules/auth/views/login_view.php">Đăng nhập</a>
+                <?php endif; ?>
             </nav>
         </div>
     </header>

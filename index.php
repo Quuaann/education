@@ -1,7 +1,6 @@
 <?php
 require_once 'includes/config.php';
 require_once 'templates/header.php';
-session_start();
 ?>
 
 <section class="banner">
