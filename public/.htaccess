@@ -10,3 +10,4 @@ RewriteRule ^(.*)$ index.php?url=$1 [L,QSA]
 <FilesMatch "\.(env|log|sql)$">
     Deny from all
 </FilesMatch>
+
