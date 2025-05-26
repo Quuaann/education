@@ -1,6 +1,6 @@
 <?php
 require_once 'includes/config.php';
-require_once 'templates/header.php';
+require_once 'app/views/templates/header.php';
 ?>
 
 <section class="banner">
@@ -13,4 +13,4 @@ require_once 'templates/header.php';
     <p>Hệ thống đào tạo trực tuyến hàng đầu</p>
 </section>
 
-<?php require_once 'templates/footer.php'; ?>
+<?php require_once 'app/views/templates/footer.php'; ?>
